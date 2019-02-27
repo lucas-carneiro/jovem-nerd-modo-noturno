@@ -1,28 +1,17 @@
 'use strict';
 
-chrome.runtime.onInstalled.addListener(function() {
+chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
 
-  // Função usada pelo site para ativar o night mode.
-  // Linha 16797, main.js:formatted
-  const s = "window.toggleNightMode()";
+  const script = `document.body.className = document.body.className.replace("light-skin","");`;
 
-  // Script injection na página
-  const script = `
-    let nm = document.createElement("script");
-    nm.innerHTML = "${s}";
-    document.head.appendChild(nm);
-  `;
-
-  chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
-    chrome.tabs.executeScript(details.tabId, {
-        code: `
-          ${script}
-          document.addEventListener("turbolinks:load", () => { ${script} });
-        `
-    });
-  }, {
-    url: [{
-        hostEquals: 'jovemnerd.com.br'
-    }],
+  chrome.tabs.executeScript(details.tabId, {
+      code: `
+        ${script}
+        document.addEventListener("turbolinks:load", () => { ${script} });
+      `
   });
+}, {
+  url: [{
+      hostEquals: 'jovemnerd.com.br'
+  }],
 });
